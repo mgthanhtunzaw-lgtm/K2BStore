@@ -39,7 +39,7 @@
             try {
                 // ၂။ Table နာမည်ကို အစ်ကို့ Table နာမည်နဲ့ ကိုက်အောင် စစ်ပါ
                 const { data, error } = await _supabase
-                    .from('"Instock List"') 
+                    .from('instock_list') 
                     .select('*')
                     .order('item_name', { ascending: true });
 
