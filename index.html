@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>K2B Online Store - Instock List</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root { --primary: #2563eb; --bg: #f8fafc; }
+        body { font-family: sans-serif; background: var(--bg); margin: 0; padding: 20px; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
+        .card { background: white; border-radius: 12px; padding: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .card img { width: 100%; height: 150px; object-fit: cover; border-radius: 8px; background: #eee; }
+        .card h3 { font-size: 15px; margin: 10px 0 5px; color: #1e293b; }
+        .price { color: var(--primary); font-weight: bold; font-size: 14px; }
+        .stock { font-size: 12px; color: #64748b; margin-top: 5px; }
+        .loading { text-align: center; padding: 50px; color: #64748b; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1 style="color: #1e293b;">K2B Online Store</h1>
+        <p style="color: #64748b;">လက်ရှိရှိသော ပစ္စည်းစာရင်းများ</p>
+    </div>
+
+    <div id="loading" class="loading">ပစ္စည်းစာရင်းများ ရယူနေသည်...</div>
+    <div id="product-list" class="grid"></div>
+
+    <script>
+        // ၁။ အစ်ကို့ရဲ့ Supabase URL နဲ့ Anon Key ကို ဒီမှာ ထည့်ပါ
+        const SUPABASE_URL = 'https://akcqhwlthhxlxxvodofb.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFrY3Fod2x0aGh4bHh4dm9kb2ZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc4OTcyMjEsImV4cCI6MjA5MzQ3MzIyMX0.vjre7iYKxh2ka4JymidN9synFfamgMe1qCDCAPXeWpM';
+        
+        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        async function fetchProducts() {
+            try {
+                // ၂။ Table နာမည်ကို အစ်ကို့ Table နာမည်နဲ့ ကိုက်အောင် စစ်ပါ
+                const { data, error } = await _supabase
+                    .from('Instock List') 
+                    .select('*')
+                    .order('item_name', { ascending: true });
+
+                if (error) throw error;
+
+                document.getElementById('loading').style.display = 'none';
+                const container = document.getElementById('product-list');
+
+                data.forEach(item => {
+                    container.innerHTML += `
+                        <div class="card">
+                            <img src="${item.image_url || 'https://via.placeholder.com/150'}" alt="${item.item_name}">
+                            <h3>${item.item_name}</h3>
+                            <div class="price">${item.price.toLocaleString()} MMK</div>
+                            <div class="stock">လက်ကျန်: ${item.instock} ခု</div>
+                        </div>
+                    `;
+                });
+            } catch (err) {
+                document.getElementById('loading').innerText = 'Error: ' + err.message;
+            }
+        }
+
+        fetchProducts();
+    </script>
+</body>
+</html>
+
